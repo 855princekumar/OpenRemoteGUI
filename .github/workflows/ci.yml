@@ -45,4 +45,4 @@ jobs:
           echo "Structure OK"
 
       - name: Run test harness
-        run: tests/run.sh
+        run: bash tests/run.sh

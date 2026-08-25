@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 220" font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arw3" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#6366f1"/>
+    </marker>
+  </defs>
+
+  <text x="460" y="26" text-anchor="middle" fill="#0f172a" font-size="17" font-weight="700">Lifecycle &amp; restore points</text>
+
+  <rect x="30"  y="70" width="150" height="66" rx="12" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+  <text x="105" y="98" text-anchor="middle" fill="#0f172a" font-size="14" font-weight="600">install.sh</text>
+  <text x="105" y="117" text-anchor="middle" fill="#475569" font-size="10.5">deploy + seed baseline</text>
+
+  <rect x="240" y="70" width="150" height="66" rx="12" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+  <text x="315" y="98" text-anchor="middle" fill="#0f172a" font-size="14" font-weight="600">running</text>
+  <text x="315" y="117" text-anchor="middle" fill="#475569" font-size="10.5">watchdog self-heals</text>
+
+  <rect x="450" y="70" width="150" height="66" rx="12" fill="#fff7ed" stroke="#f59e0b" stroke-width="2"/>
+  <text x="525" y="98" text-anchor="middle" fill="#0f172a" font-size="14" font-weight="600">rollback.sh</text>
+  <text x="525" y="117" text-anchor="middle" fill="#475569" font-size="10.5">archives version first</text>
+
+  <rect x="660" y="70" width="150" height="66" rx="12" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+  <text x="735" y="98" text-anchor="middle" fill="#0f172a" font-size="14" font-weight="600">restore.sh</text>
+  <text x="735" y="117" text-anchor="middle" fill="#475569" font-size="10.5">reinstall any version</text>
+
+  <g stroke="#6366f1" stroke-width="2" fill="none">
+    <line x1="180" y1="103" x2="238" y2="103" marker-end="url(#arw3)"/>
+    <line x1="390" y1="103" x2="448" y2="103" marker-end="url(#arw3)"/>
+    <line x1="600" y1="103" x2="658" y2="103" marker-end="url(#arw3)"/>
+  </g>
+
+  <!-- restore store -->
+  <rect x="450" y="160" width="360" height="40" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="630" y="185" text-anchor="middle" fill="#334155" font-size="12">/opt/openremotegui-restore/vX.Y.Z-TIMESTAMP  (one per version)</text>
+  <line x1="525" y1="136" x2="560" y2="158" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <line x1="735" y1="136" x2="700" y2="158" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 3"/>
+</svg>

@@ -1,0 +1,20 @@
+[Unit]
+Description=OpenRemoteGUI Wayland VNC server (loopback only)
+Documentation=https://github.com/@OWNER@/OpenRemoteGUI
+# User-manager ordering only: no system-target coupling (avoids the
+# ordering cycle that broke boot in 1.0.0). Best-effort start after the desktop
+# session; the launcher also waits for the Wayland socket to absorb boot races.
+After=graphical-session.target
+Wants=graphical-session.target
+StartLimitIntervalSec=300
+StartLimitBurst=10
+
+[Service]
+Type=simple
+Environment=ORGUI_ETC=@ETC@
+ExecStart=@PREFIX@/scripts/wayvnc-start.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,23 @@
+# OpenRemoteGUI configuration (example)
+# The installer writes the live copy to /etc/openremotegui/openremotegui.conf.
+# Values here are shell assignments; keep them simple KEY=value pairs.
+
+# Browser gateway (the only port intended to face the network).
+HTTP_PORT=6080
+
+# VNC endpoint. Bound to loopback by design; do not expose this to the LAN.
+VNC_HOST=127.0.0.1
+VNC_PORT=5900
+
+# Desktop session that wayvnc attaches to (filled in by the installer).
+WAYVNC_USER=pi
+WAYVNC_UID=1000
+
+# Install locations.
+NOVNC_DIR=/opt/openremotegui/noVNC
+NOVNC_VENV=/opt/openremotegui/venv
+
+# Optional VNC-layer authentication (see SECURITY.md and ADR-0010).
+# 0 = rely on the network trust boundary (default, loopback-only VNC)
+# 1 = enable wayvnc username/password auth (requires TLS material)
+ENABLE_VNC_AUTH=0

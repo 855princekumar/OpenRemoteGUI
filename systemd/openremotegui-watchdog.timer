@@ -1,0 +1,12 @@
+[Unit]
+Description=OpenRemoteGUI health watchdog timer
+
+[Timer]
+OnBootSec=45s
+OnUnitActiveSec=30s
+Unit=openremotegui-watchdog.service
+AccuracySec=5s
+Persistent=true
+
+[Install]
+WantedBy=timers.target

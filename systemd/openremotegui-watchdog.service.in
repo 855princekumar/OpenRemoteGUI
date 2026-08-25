@@ -1,0 +1,8 @@
+[Unit]
+Description=OpenRemoteGUI health watchdog (self-healing)
+Documentation=https://github.com/@OWNER@/OpenRemoteGUI
+
+[Service]
+Type=oneshot
+Environment=ORGUI_ETC=@ETC@
+ExecStart=@PREFIX@/scripts/watchdog.sh

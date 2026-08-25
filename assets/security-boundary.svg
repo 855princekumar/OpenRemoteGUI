@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 430" font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arw2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <text x="360" y="28" text-anchor="middle" fill="#0f172a" font-size="17" font-weight="700">Security model — the network is the trust boundary</text>
+
+  <!-- network zone -->
+  <rect x="40" y="50" width="640" height="120" rx="14" fill="#eff6ff" stroke="#3b82f6" stroke-dasharray="6 4" stroke-width="2"/>
+  <text x="60" y="74" fill="#2563eb" font-size="12" font-weight="700">TRUSTED NETWORK (LAN / VPN)</text>
+  <rect x="80" y="86" width="200" height="60" rx="10" fill="#ffffff" stroke="#3b82f6" stroke-width="2"/>
+  <text x="180" y="112" text-anchor="middle" fill="#0f172a" font-size="14" font-weight="600">Browser</text>
+  <text x="180" y="131" text-anchor="middle" fill="#475569" font-size="11">admin over VPN/LAN</text>
+
+  <rect x="440" y="86" width="200" height="60" rx="10" fill="#ffffff" stroke="#3b82f6" stroke-width="2"/>
+  <text x="540" y="112" text-anchor="middle" fill="#0f172a" font-size="14" font-weight="600">Gateway :6080</text>
+  <text x="540" y="131" text-anchor="middle" fill="#475569" font-size="11">HTTP (behind VPN/LAN)</text>
+
+  <line x1="280" y1="116" x2="438" y2="116" stroke="#64748b" stroke-width="2" marker-end="url(#arw2)"/>
+
+  <!-- host zone -->
+  <rect x="180" y="200" width="360" height="180" rx="14" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+  <text x="200" y="224" fill="#059669" font-size="12" font-weight="700">EDGE NODE (loopback only)</text>
+
+  <rect x="260" y="238" width="200" height="46" rx="9" fill="#ffffff" stroke="#10b981" stroke-width="2"/>
+  <text x="360" y="266" text-anchor="middle" fill="#0f172a" font-size="13" font-weight="600">websockify</text>
+
+  <rect x="260" y="298" width="200" height="46" rx="9" fill="#ffffff" stroke="#10b981" stroke-width="2"/>
+  <text x="360" y="320" text-anchor="middle" fill="#0f172a" font-size="13" font-weight="600">wayvnc 127.0.0.1:5900</text>
+  <text x="360" y="337" text-anchor="middle" fill="#475569" font-size="10.5">never bound to the network</text>
+
+  <line x1="540" y1="146" x2="400" y2="236" stroke="#64748b" stroke-width="2" marker-end="url(#arw2)"/>
+  <line x1="360" y1="284" x2="360" y2="296" stroke="#64748b" stroke-width="2" marker-end="url(#arw2)"/>
+
+  <!-- blocked raw vnc -->
+  <rect x="500" y="238" width="180" height="46" rx="9" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/>
+  <text x="590" y="260" text-anchor="middle" fill="#b91c1c" font-size="12" font-weight="600">Raw VNC on the LAN</text>
+  <text x="590" y="277" text-anchor="middle" fill="#b91c1c" font-size="11">blocked / never exposed</text>
+  <line x1="510" y1="248" x2="670" y2="274" stroke="#ef4444" stroke-width="2"/>
+
+  <text x="360" y="410" text-anchor="middle" fill="#334155" font-size="12">
+    Put :6080 behind a VPN/LAN or a TLS reverse proxy. Do not expose it to the public internet.
+  </text>
+</svg>

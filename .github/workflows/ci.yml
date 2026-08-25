@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint-and-validate:
+    name: Lint & validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ShellCheck
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+
+      - name: Bash syntax check
+        run: |
+          for f in install.sh rollback.sh update.sh restore.sh scripts/*.sh lib/common.sh; do
+            bash -n "$f"
+          done
+
+      - name: ShellCheck
+        run: shellcheck -x -e SC1091 install.sh rollback.sh update.sh restore.sh scripts/*.sh lib/common.sh tests/run.sh
+
+      - name: Validate systemd unit templates render
+        run: |
+          set -euo pipefail
+          for f in systemd/*.in; do
+            out="$(sed -e 's|@OWNER@|acme|g' -e 's|@PREFIX@|/opt/openremotegui|g' -e 's|@ETC@|/etc/openremotegui|g' "$f")"
+            echo "$out" | grep -q '\[Unit\]' || { echo "Missing [Unit] in $f"; exit 1; }
+            echo "$out" | grep -q '@' && { echo "Unsubstituted token in $f"; exit 1; }
+            echo "OK: $f"
+          done
+
+      - name: Structure check
+        run: |
+          for req in install.sh rollback.sh update.sh VERSION LICENSE README.md \
+                     SECURITY.md CONTRIBUTING.md CODE_OF_CONDUCT.md CHANGELOG.md; do
+            test -f "$req" || { echo "Missing required file: $req"; exit 1; }
+          done
+          test -d docs/adr || { echo "Missing docs/adr"; exit 1; }
+          echo "Structure OK"
+
+      - name: Run test harness
+        run: tests/run.sh

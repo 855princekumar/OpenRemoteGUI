@@ -104,18 +104,18 @@ Raspberry Pi OS Lite / Debian
 
 ## Features
 
-- **One-command install** — `git clone` → `sudo ./install.sh` → browser.
-- **Loopback-only VNC** — raw VNC (`5900`) is never bound to the network; only the
+- **One-command install** - `git clone` → `sudo ./install.sh` → browser.
+- **Loopback-only VNC** - raw VNC (`5900`) is never bound to the network; only the
   gateway (`6080`) is reachable.
-- **Manifest-driven rollback** — removes/restores *exactly* what was installed; no
+- **Manifest-driven rollback** - removes/restores *exactly* what was installed; no
   blanket `apt remove` or `rm -rf`.
-- **Self-healing watchdog** — restarts only OpenRemoteGUI units, backs off on headless
+- **Self-healing watchdog** - restarts only OpenRemoteGUI units, backs off on headless
   nodes instead of thrashing.
-- **Hardware-aware** — Pi Zero/3 (lightweight) · Pi 4 (standard) · Pi 5 (GPU) · generic Debian.
-- **Fails safe** — no Wayland session and no compositor? It makes **no changes** and tells you why.
-- **Isolated footprint** — everything under `/opt/openremotegui`, `/etc/openremotegui`,
+- **Hardware-aware** - Pi Zero/3 (lightweight) · Pi 4 (standard) · Pi 5 (GPU) · generic Debian.
+- **Fails safe** - no Wayland session and no compositor? It makes **no changes** and tells you why.
+- **Isolated footprint** - everything under `/opt/openremotegui`, `/etc/openremotegui`,
   `/var/lib/openremotegui`; private Python virtualenv for websockify.
-- **Auto-rollback on failed install** — a broken install reverts itself.
+- **Auto-rollback on failed install** - a broken install reverts itself.
 
 ## Architecture
 
@@ -148,7 +148,7 @@ flowchart LR
 port 6080. Everything to the right of the gateway lives on the node itself; the VNC hop is
 bound to `127.0.0.1`, so the raw protocol is never visible on the network.
 
-Security boundary — the browser talks to `6080`; raw VNC stays on loopback:
+Security boundary - the browser talks to `6080`; raw VNC stays on loopback:
 
 ```mermaid
 flowchart TB
@@ -202,7 +202,7 @@ which streams the live desktop back.
 
 `wayvnc` attaches to a running **wlroots-based** Wayland compositor (labwc, Wayfire,
 sway, ...) and can operate without a physical monitor. OpenRemoteGUI never starts a
-desktop of its own — the session must already exist.
+desktop of its own - the session must already exist.
 
 ## Supported Platforms
 
@@ -255,7 +255,7 @@ flowchart TD
     P -- No --> T["Report + (auto-rollback on hard failure)"]
 ```
 
-**Reading it:** the installer refuses to touch a node with no Wayland session, records every change as it goes, verifies health at the end, and reverts itself if a step fails — so a half-finished install never lingers.
+**Reading it:** the installer refuses to touch a node with no Wayland session, records every change as it goes, verifies health at the end, and reverts itself if a step fails - so a half-finished install never lingers.
 
 Environment overrides:
 
@@ -320,14 +320,14 @@ flowchart TB
 ```
 
 **Reading it:** authentication and encryption are expected to come from the layer you
-already trust — the VPN or LAN, or a TLS reverse proxy you place in front of 6080. Inside
+already trust - the VPN or LAN, or a TLS reverse proxy you place in front of 6080. Inside
 the node the chain is loopback-only, so compromising the transport requires already being
 on the trusted network.
 
 Principles:
 
 - **No vendor cloud** and **no outbound control plane** are required.
-- **Raw VNC is never bound to the network** — it lives on `127.0.0.1:5900`.
+- **Raw VNC is never bound to the network** - it lives on `127.0.0.1:5900`.
 - The **network is the trust boundary**: deploy `6080` behind a VPN/LAN or a TLS
   reverse proxy.
 - SSH remains fully independent and untouched.
@@ -536,7 +536,7 @@ ansible all -b -m shell -a "cd /opt/src/OpenRemoteGUI && ORGUI_NO_PROMPT=1 ./ins
 ansible all -b -m shell -a "cd /opt/src/OpenRemoteGUI && ./rollback.sh"
 ```
 
-Your control plane only needs `http://NODE:6080` — it never has to understand VNC.
+Your control plane only needs `http://NODE:6080` - it never has to understand VNC.
 
 > [!IMPORTANT]
 > Before a large rollout, run the [Fleet Pilot Checklist](docs/operations/fleet-pilot.md)
@@ -661,7 +661,7 @@ See [`CHANGELOG.md`](CHANGELOG.md).
 The security model of this build assumes the network itself is a trust boundary
 (private LAN or VPN). On such networks the raw VNC port is never exposed and only the
 local browser gateway is reachable. Outside that boundary, plain HTTP on `:6080` and
-the default VNC-layer settings are **not** sufficient — so this release deliberately
+the default VNC-layer settings are **not** sufficient - so this release deliberately
 does not target the public internet.
 
 ### Planned: public-route mode (future release)

@@ -19,6 +19,10 @@ No vendor cloud. No proprietary client. No account. No lock-in.
 </div>
 
 <p align="center">
+  <img src="./assets/banner.png" alt="OpenRemoteGUI" width="100%">
+</p>
+
+<p align="center">
   <img src="assets/architecture.svg" alt="OpenRemoteGUI architecture: Browser to noVNC to websockify to wayvnc to Wayland desktop" width="100%">
 </p>
 

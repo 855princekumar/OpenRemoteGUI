@@ -104,18 +104,18 @@ Raspberry Pi OS Lite / Debian
 
 ## Features
 
-- **One-command install** - `git clone` → `sudo ./install.sh` → browser.
-- **Loopback-only VNC** - raw VNC (`5900`) is never bound to the network; only the
+- **One-command install** — `git clone` → `sudo ./install.sh` → browser.
+- **Loopback-only VNC** — raw VNC (`5900`) is never bound to the network; only the
   gateway (`6080`) is reachable.
-- **Manifest-driven rollback** - removes/restores *exactly* what was installed; no
+- **Manifest-driven rollback** — removes/restores *exactly* what was installed; no
   blanket `apt remove` or `rm -rf`.
-- **Self-healing watchdog** - restarts only OpenRemoteGUI units, backs off on headless
+- **Self-healing watchdog** — restarts only OpenRemoteGUI units, backs off on headless
   nodes instead of thrashing.
-- **Hardware-aware** - Pi Zero/3 (lightweight) · Pi 4 (standard) · Pi 5 (GPU) · generic Debian.
-- **Fails safe** - no Wayland session and no compositor? It makes **no changes** and tells you why.
-- **Isolated footprint** - everything under `/opt/openremotegui`, `/etc/openremotegui`,
+- **Hardware-aware** — Pi Zero/3 (lightweight) · Pi 4 (standard) · Pi 5 (GPU) · generic Debian.
+- **Fails safe** — no Wayland session and no compositor? It makes **no changes** and tells you why.
+- **Isolated footprint** — everything under `/opt/openremotegui`, `/etc/openremotegui`,
   `/var/lib/openremotegui`; private Python virtualenv for websockify.
-- **Auto-rollback on failed install** - a broken install reverts itself.
+- **Auto-rollback on failed install** — a broken install reverts itself.
 
 ## Architecture
 
@@ -129,7 +129,7 @@ command tears it down.
   <img src="assets/architecture.svg" alt="Request path from browser to Wayland desktop" width="100%">
 </p>
 
-High-level data path:
+High-level data path (GitHub renders this Mermaid natively):
 
 ```mermaid
 flowchart LR
@@ -148,7 +148,7 @@ flowchart LR
 port 6080. Everything to the right of the gateway lives on the node itself; the VNC hop is
 bound to `127.0.0.1`, so the raw protocol is never visible on the network.
 
-Security boundary - the browser talks to `6080`; raw VNC stays on loopback:
+Security boundary — the browser talks to `6080`; raw VNC stays on loopback:
 
 ```mermaid
 flowchart TB
@@ -202,7 +202,7 @@ which streams the live desktop back.
 
 `wayvnc` attaches to a running **wlroots-based** Wayland compositor (labwc, Wayfire,
 sway, ...) and can operate without a physical monitor. OpenRemoteGUI never starts a
-desktop of its own - the session must already exist.
+desktop of its own — the session must already exist.
 
 ## Supported Platforms
 
@@ -255,7 +255,7 @@ flowchart TD
     P -- No --> T["Report + (auto-rollback on hard failure)"]
 ```
 
-**Reading it:** the installer refuses to touch a node with no Wayland session, records every change as it goes, verifies health at the end, and reverts itself if a step fails - so a half-finished install never lingers.
+**Reading it:** the installer refuses to touch a node with no Wayland session, records every change as it goes, verifies health at the end, and reverts itself if a step fails — so a half-finished install never lingers.
 
 Environment overrides:
 
@@ -320,14 +320,14 @@ flowchart TB
 ```
 
 **Reading it:** authentication and encryption are expected to come from the layer you
-already trust - the VPN or LAN, or a TLS reverse proxy you place in front of 6080. Inside
+already trust — the VPN or LAN, or a TLS reverse proxy you place in front of 6080. Inside
 the node the chain is loopback-only, so compromising the transport requires already being
 on the trusted network.
 
 Principles:
 
 - **No vendor cloud** and **no outbound control plane** are required.
-- **Raw VNC is never bound to the network** - it lives on `127.0.0.1:5900`.
+- **Raw VNC is never bound to the network** — it lives on `127.0.0.1:5900`.
 - The **network is the trust boundary**: deploy `6080` behind a VPN/LAN or a TLS
   reverse proxy.
 - SSH remains fully independent and untouched.
@@ -339,6 +339,46 @@ Principles:
 > a trusted VPN/LAN or a reverse proxy that terminates TLS and authentication. See
 > [`SECURITY.md`](SECURITY.md) and [ADR-0005](docs/adr/ADR-0005-localhost-vnc-binding.md) /
 > [ADR-0010](docs/adr/ADR-0010-authentication-default.md).
+
+## Gateway Authentication
+
+By default (`GATEWAY_AUTH=1`) the installer puts a minimal **nginx** reverse proxy in
+front of the gateway that enforces **HTTP Basic Auth**, and moves websockify to loopback
+`:6081`. You get a real browser username/password prompt protecting both the page and the
+desktop stream.
+
+```mermaid
+flowchart LR
+    B[Browser] -->|Basic Auth| NX["nginx :6080<br/>auth_basic"]
+    NX -->|proxy| WS["websockify<br/>127.0.0.1:6081"]
+    WS --> VNC["wayvnc 127.0.0.1:5900"]
+```
+
+**Reading it:** nginx challenges the browser on the page request; once you log in, the
+browser reuses the same credentials on the WebSocket, so the whole session is gated by one
+prompt. websockify never faces the network directly.
+
+Setting credentials:
+
+```bash
+# Interactive: the installer prompts for username + password
+sudo ./install.sh
+
+# Non-interactive / fleet: pass credentials
+sudo ORGUI_AUTH_USER=admin ORGUI_AUTH_PASS='choose-a-strong-one' ./install.sh
+
+# Disable auth entirely (rely on VPN/LAN only)
+sudo ORGUI_GATEWAY_AUTH=0 ./install.sh
+```
+
+Credentials are stored as an apr1 hash in `/etc/openremotegui/gateway.htpasswd`. To change
+them later, edit that file with `openssl passwd -apr1` or reinstall.
+
+> [!WARNING]
+> Basic Auth over plain HTTP sends the password **base64-encoded, not encrypted**. It is a
+> baseline to keep casual and accidental access out on a trusted VPN/LAN, not protection
+> against network sniffing. For real confidentiality, front the node with a TLS-terminating
+> reverse proxy (planned public-route mode). See ADR-0013.
 
 ## Service Architecture
 
@@ -388,9 +428,9 @@ PACKAGE|wayvnc
 DIR|/opt/openremotegui/noVNC
 DIR|/opt/openremotegui/venv
 FILE|/etc/openremotegui/openremotegui.conf
-FILE|/etc/systemd/system/openremotegui-wayvnc.service
-BACKUP|/etc/systemd/system/openremotegui-watchdog.timer
-ENABLED|openremotegui-wayvnc.service
+FILE|/etc/systemd/user/openremotegui-wayvnc.service
+LINGER|pi
+ENABLED_USER|openremotegui-wayvnc.service
 ```
 
 Backups of any overwritten file are stored under `/var/lib/openremotegui/backups/`.
@@ -496,7 +536,7 @@ ansible all -b -m shell -a "cd /opt/src/OpenRemoteGUI && ORGUI_NO_PROMPT=1 ./ins
 ansible all -b -m shell -a "cd /opt/src/OpenRemoteGUI && ./rollback.sh"
 ```
 
-Your control plane only needs `http://NODE:6080` - it never has to understand VNC.
+Your control plane only needs `http://NODE:6080` — it never has to understand VNC.
 
 > [!IMPORTANT]
 > Before a large rollout, run the [Fleet Pilot Checklist](docs/operations/fleet-pilot.md)
@@ -550,6 +590,7 @@ Full records live in [`docs/adr/`](docs/adr/). Index:
 | [0010](docs/adr/ADR-0010-authentication-default.md) | Authentication default & trust boundary | Accepted |
 | [0011](docs/adr/ADR-0011-rpi-connect-coexistence.md) | Coexistence with Raspberry Pi Connect | Accepted |
 | [0012](docs/adr/ADR-0012-user-service-session-model.md) | Capture as systemd user services with linger | Accepted |
+| [0013](docs/adr/ADR-0013-gateway-basic-auth.md) | Baseline gateway Basic Auth via nginx | Accepted |
 
 ## Operational Workflow
 
@@ -572,7 +613,7 @@ stateDiagram-v2
 
 | Symptom | Likely cause | Action |
 | --- | --- | --- |
-| `Unsupported security types (types: 262)` in browser console | Gateway is pointed at Raspberry Pi Connect's wayvnc (RSA-AES only), not ours | This build which disables rpi-connect's screen sharing and runs our own wayvnc; or run `rpi-connect vnc off` |
+| `Unsupported security types (types: 262)` in browser console | Gateway is pointed at Raspberry Pi Connect's wayvnc (RSA-AES only), not ours | Reinstall (this build disables rpi-connect screen sharing and runs its own wayvnc), or run `rpi-connect vnc off` |
 | `noVNC requires a secure context (TLS)` warning | Encrypted VNC auth needs WebCrypto, unavailable over plain HTTP | Expected on HTTP; our wayvnc uses security type `None`, so it still works behind a VPN/LAN |
 | wayvnc exits with `Failed to bind` / SIGSEGV | VNC port already held by another VNC server | This build pre-flights and auto-selects a free port; check `sudo ss -ltnp \| grep 5900` |
 | Boot log: `Found ordering cycle on graphical.target` | 1.0.0 system-unit cycle | Handled by this build (user services) |
@@ -580,6 +621,8 @@ stateDiagram-v2
 | `:6080` refuses connection | Gateway not running | `journalctl --user -u openremotegui-novnc -n 100 --no-pager` |
 | Black screen in browser | wayvnc not attached / no display output | Confirm a wlroots compositor is running; on headless nodes attach an HDMI dummy or force a KMS mode |
 | Wrong desktop user detected | Multiple accounts | Reinstall with `ORGUI_USER=<name>` |
+| Browser keeps asking for password | Wrong credentials, or htpasswd unreadable by nginx | Check `/etc/openremotegui/gateway.htpasswd`; reinstall or update the hash with `openssl passwd -apr1` |
+| Want no login prompt | Auth is on by default | Reinstall with `ORGUI_GATEWAY_AUTH=0` |
 
 ## Development & Testing
 
@@ -597,11 +640,11 @@ tests/run.sh
 ## Release Process
 
 ```bash
-git tag -a v1.0.0 -m "OpenRemoteGUI v1.0.0"
-git push origin v1.0.0
+git tag -a v1.0.1 -m "OpenRemoteGUI v1.0.1"
+git push origin v1.0.1
 ```
 
-Then create the GitHub Release from the `v1.0.0` tag and attach the packaged archive.
+Then create the GitHub Release from the `v1.0.1` tag and attach the packaged archive.
 See [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Network Scope
@@ -618,7 +661,7 @@ See [`CHANGELOG.md`](CHANGELOG.md).
 The security model of this build assumes the network itself is a trust boundary
 (private LAN or VPN). On such networks the raw VNC port is never exposed and only the
 local browser gateway is reachable. Outside that boundary, plain HTTP on `:6080` and
-the default VNC-layer settings are **not** sufficient - so this release deliberately
+the default VNC-layer settings are **not** sufficient — so this release deliberately
 does not target the public internet.
 
 ### Planned: public-route mode (future release)

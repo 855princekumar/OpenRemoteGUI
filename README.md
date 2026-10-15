@@ -219,7 +219,7 @@ the installer will not create one.
 ```bash
 git clone https://github.com/855princekumar/OpenRemoteGUI.git
 cd OpenRemoteGUI
-sudo ./install.sh
+sudo bashh install.sh
 ```
 
 Then open:
